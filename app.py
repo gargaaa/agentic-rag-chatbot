@@ -1,39 +1,22 @@
 import streamlit as st
-import uuid
-import os
-from agents.ingestion_agent import IngestionAgent
 from agents.retrieval_agent import RetrievalAgent
-from agents.llm_response_agent import LLMResponseAgent
+from utils.file_loader import load_file
 
 st.set_page_config(page_title="Agentic RAG Chatbot", layout="wide")
-st.title("🤖 Agentic RAG Chatbot")
-st.markdown("Upload documents (PDF, DOCX, PPTX, CSV, TXT/Markdown) and ask questions!")
 
-uploaded_files = st.file_uploader("📁 Upload your files", accept_multiple_files=True)
-query = st.text_input("❓ Ask a question about the documents")
+st.title("🤖 Agentic RAG Chatbot for Document QA")
+uploaded_file = st.file_uploader("Upload a document (PDF, DOCX, PPTX, CSV, MD, TXT)", type=["pdf", "docx", "pptx", "csv", "md", "txt"])
 
-if uploaded_files and query:
-    trace_id = str(uuid.uuid4())
-    ingestion = IngestionAgent()
-    retrieval = RetrievalAgent()
-    llm = LLMResponseAgent()
-    if not os.path.exists("data"):
-     os.makedirs("data")
-    file_paths = []
-    for f in uploaded_files:
-        path = f"data/{f.name}"
-        with open(path, "wb") as out:
-            out.write(f.read())
-        file_paths.append(path)
+if uploaded_file:
+    with open(f"data/{uploaded_file.name}", "wb") as f:
+        f.write(uploaded_file.getbuffer())
+    
+    st.success("File uploaded successfully!")
+    file_path = f"data/{uploaded_file.name}"
+    file_content = load_file(file_path)
+    st.text_area("Extracted Text Preview", value=file_content[:3000], height=300)
 
-    doc_msg = ingestion.run(file_paths, trace_id)
-    retrieval.index_docs(doc_msg["payload"]["docs"])
-    retr_msg = retrieval.retrieve(query, trace_id)
-    llm_msg = llm.run(retr_msg["payload"], trace_id)
-
-    st.subheader("💬 Answer")
-    st.success(llm_msg["payload"]["answer"])
-
-    st.subheader("📚 Retrieved Context")
-    for chunk in retr_msg["payload"]["retrieved_context"]:
-        st.markdown(f"> {chunk}")
+    query = st.text_input("Ask your question about the document")
+    if query:
+        st.info("Retrieval and answer generation is not implemented here (mock demo).")
+        # Add RAG logic or LLM response here.
