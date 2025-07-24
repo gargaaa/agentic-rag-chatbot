@@ -1,5 +1,6 @@
 import streamlit as st
 import uuid
+import os
 from agents.ingestion_agent import IngestionAgent
 from agents.retrieval_agent import RetrievalAgent
 from agents.llm_response_agent import LLMResponseAgent
@@ -16,7 +17,8 @@ if uploaded_files and query:
     ingestion = IngestionAgent()
     retrieval = RetrievalAgent()
     llm = LLMResponseAgent()
-
+    if not os.path.exists("data"):
+     os.makedirs("data")
     file_paths = []
     for f in uploaded_files:
         path = f"data/{f.name}"
