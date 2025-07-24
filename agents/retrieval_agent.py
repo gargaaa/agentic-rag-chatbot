@@ -2,10 +2,14 @@ from sentence_transformers import SentenceTransformer
 from utils.mcp import create_message
 import faiss
 import numpy as np
+import torch
 
 class RetrievalAgent:
     def __init__(self):
-        self.model = SentenceTransformer('all-MiniLM-L6-v2', device='cpu')
+        device = 'cpu'
+        torch_device = torch.device(device)
+        self.model = SentenceTransformer('all-MiniLM-L6-v2', device=device)
+        self.model.to(torch_device)
         self.index = faiss.IndexFlatL2(384)
         self.docs = []
 
