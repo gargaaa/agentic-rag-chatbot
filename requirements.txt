@@ -1,11 +1,8 @@
 streamlit==1.33.0
 sentence-transformers==2.2.2
-torch==1.13.1+cpu
-torchvision==0.14.1+cpu
-torchaudio==0.13.1
+torch==1.12.1
 PyPDF2
 python-docx
 python-pptx
 pandas
 openai
---extra-index-url https://download.pytorch.org/whl/cpu
