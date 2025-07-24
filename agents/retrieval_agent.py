@@ -1,21 +1,29 @@
 from sentence_transformers import SentenceTransformer
-from utils.mcp import create_message
-import faiss
+from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
+import torch
 
 class RetrievalAgent:
     def __init__(self):
-        self.model = SentenceTransformer('all-MiniLM-L6-v2', device= 'cpu')
-        self.index = faiss.IndexFlatL2(384)
-        self.docs = []
+        # FORCE model to run on CPU ONLY
+        torch_device = "cpu"
+        self.model = SentenceTransformer("all-MiniLM-L6-v2")
+        self.model.to(torch_device)  # manually override
+        # This avoids meta tensor copying error
 
-    def index_docs(self, docs):
-        embeddings = self.model.encode(docs)
-        self.index.add(np.array(embeddings))
-        self.docs = docs
+    def embed_texts(self, texts):
+        return self.model.encode(texts, convert_to_tensor=True)
 
-    def retrieve(self, query, trace_id):
-        query_emb = self.model.encode([query])
-        D, I = self.index.search(np.array(query_emb), 3)
-        top_chunks = [self.docs[i] for i in I[0]]
-        return create_message
+    def retrieve(self, query, documents, top_k=3):
+        query_embedding = self.embed_texts([query])[0]
+        doc_embeddings = self.embed_texts(documents)
+
+        # Compute cosine similarities
+        similarities = cosine_similarity(
+            query_embedding.cpu().numpy().reshape(1, -1),
+            [emb.cpu().numpy() for emb in doc_embeddings]
+        )[0]
+
+        # Get top-k relevant documents
+        top_indices = np.argsort(similarities)[::-1][:top_k]
+        return [documents[i] for i in top_indices]
