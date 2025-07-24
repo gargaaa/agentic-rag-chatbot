@@ -2,3 +2,10 @@ streamlit==1.33.0
 sentence-transformers==2.2.2
 torch==2.5.1
 openai
+langchain==0.1.14
+faiss-cpu==1.7.4
+python-dotenv
+PyPDF2
+python-pptx
+docx2txt
+pandas
