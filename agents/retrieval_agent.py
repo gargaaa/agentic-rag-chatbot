@@ -5,7 +5,7 @@ import numpy as np
 
 class RetrievalAgent:
     def __init__(self):
-        self.model = SentenceTransformer('all-MiniLM-L6-v2')
+        self.model = SentenceTransformer('all-MiniLM-L6-v2', device='cpu')
         self.index = faiss.IndexFlatL2(384)
         self.docs = []
 
