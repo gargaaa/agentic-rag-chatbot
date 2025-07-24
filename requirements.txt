@@ -2,7 +2,7 @@ streamlit
 openai
 faiss-cpu
 sentence-transformers
-pypdf
+pyPDF2
 python-docx
 python-pptx
 pandas
